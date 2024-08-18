@@ -56,15 +56,16 @@
         <a href="/login">LOGIN</a>
         <a href="/signup">SIGNUP</a>
         <a href="/profile">PROFILE</a>
+        <a href="/signout">SIGNOUT</a>
     </nav>
     <h1>UPDATE POST</h1>
-    <form action="/updatepost" method="post">
+    <form action="/updatepost/{{data[0][0]}}" method="post">
         <label for="title">Post Title:</label>
-        <input type="text" name="post_title" value = {{ data[0]["post_title"] }} >
+        <input type="text" name="post_title" value="{{data[0][2]}}">
         <label for="description">Post Body:</label>
-        <textarea name="post_body"> {{ data[0]['post_body'] }} </textarea>
+        <textarea name="post_body"> {{data[0][3]}} </textarea>
         <label for="tag">Post Tag:</label>
-        <input type="text" name="post_tag" value= {{data[0]['post_tag']}}>
+        <input type="text" name="post_tag" value="{{data[0][4]}}">
         <button>UPDATE</button>
     </form>
 </body>

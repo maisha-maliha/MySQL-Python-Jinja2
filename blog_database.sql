@@ -12,3 +12,6 @@ CREATE TABLE blog_posts(
     post_body VARCHAR(500),
     post_tag VARCHAR(30)
 );
+
+SELECT * FROM blog_posts;
+SELECT * FROM authors;

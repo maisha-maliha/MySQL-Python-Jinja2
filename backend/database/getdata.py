@@ -1,13 +1,13 @@
 import mysql.connector
 import backend.hashit as hashit
-
+import config
 # get all authors
 def getAuthors():
     # connecting to database
     try:
-       cnx = mysql.connector.connect(user='root', password='test30',host='127.0.0.1',database='blog')
+        cnx = mysql.connector.connect(user = config.DATABASE_USER, password = config.DATABASE_PASSWORD,host = config.DATABASE_HOST,database = config.DATABASE)
     except:
-        return (False, "couldn't connect to database authors")
+        return (False, "couldn't connect to database")
     # cursor for querying in database
     cursor = cnx.cursor()
     query = "SELECT * FROM authors"
@@ -24,9 +24,9 @@ def getAuthors():
 def getBlogPosts():
     # connecting to database
     try:
-        cnx = mysql.connector.connect(user='root', password='test30',host='127.0.0.1',database='blog')
+        cnx = mysql.connector.connect(user = config.DATABASE_USER, password = config.DATABASE_PASSWORD,host = config.DATABASE_HOST,database = config.DATABASE)
     except:
-        return (False, "couldn't connect to database blog_post")
+        return (False, "couldn't connect to database")
     # cursor for querying in database
     cursor = cnx.cursor()
     query = "SELECT * FROM blog_posts"
@@ -42,9 +42,9 @@ def getBlogPosts():
 def getAuthorPosts(id):
         # connecting to database
     try:
-        cnx = mysql.connector.connect(user='root', password='test30',host='127.0.0.1',database='blog')
+        cnx = mysql.connector.connect(user = config.DATABASE_USER, password = config.DATABASE_PASSWORD,host = config.DATABASE_HOST,database = config.DATABASE)
     except:
-        return (False, "couldn't connect to database blog_post")
+        return (False, "couldn't connect to database")
     # cursor for querying in database
     cursor = cnx.cursor()
     query = f"SELECT * FROM blog_posts WHERE author_id = {id}"
@@ -61,12 +61,12 @@ def getAuthorPosts(id):
 def getPost(id):
     # connecting to database
     try:
-        cnx = mysql.connector.connect(user='root', password='test30',host='127.0.0.1',database='blog')
+        cnx = mysql.connector.connect(user = config.DATABASE_USER, password = config.DATABASE_PASSWORD,host = config.DATABASE_HOST,database = config.DATABASE)
     except:
-        return (False, "couldn't connect to database blog_post")
+        return (False, "couldn't connect to database")
     # cursor for querying in database
     cursor = cnx.cursor()
-    query = f"SELECT * FROM blog_posts WHERE post_id = {id}"
+    query = f"SELECT * FROM blog_posts WHERE post_id = {int(id)}"
     try:
         cursor.execute(query)
     except:
@@ -80,9 +80,9 @@ def getPost(id):
 def getAuthor(id):
     # connecting to database
     try:
-        cnx = mysql.connector.connect(user='root', password='test30',host='127.0.0.1',database='blog')
+        cnx = mysql.connector.connect(user = config.DATABASE_USER, password = config.DATABASE_PASSWORD,host = config.DATABASE_HOST,database = config.DATABASE)
     except:
-        return (False, "couldn't connect to database author")
+        return (False, "couldn't connect to database")
     # cursor for querying in database
     cursor = cnx.cursor()
     query = f"SELECT * FROM authors WHERE author_id = {id}"

@@ -44,14 +44,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
     #  all POST request handled here
     def do_POST(self):
-        # check if token exists
-        try:
-            user_data = self.verify_token()
-            print(user_data)
-        except jwt.exceptions.ExpiredSignatureError:
-            user_data = None
-            print('token expired')
-            self.settingheader(303, 'Location', '/login')
 
 
         #  ========== /LOGIN
@@ -59,24 +51,19 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             # get POST data
             content_length = int(self.headers['Content-Length'])
             byte_data = self.rfile.read(content_length)
-            print(byte_data)
             data = modify.separate_key_data(byte_data)
 
             # send POST data
             if data[0]['user_name'] and data[1]['user_password']:
-
                 # authenticate returns [exists, user_id]
                 user_exists = db.checkUser(data[0]['user_name'], data[1]['user_password'])
-                print(user_exists)
-
                 # send token
                 if user_exists[0]:
                     token = tokenit.tokenit(user_exists[1],data[0]['user_name'])
-                    print(token)
                     # set header
                     self.settingheader(303,'Location', '/profile', token)
                 else:
-                    self.wfile.write(json.dumps({'info': 'failed','token': ''}).encode('utf-8'))
+                    self.settingheader(303,'Location', '/login')
 
 
 
@@ -97,13 +84,19 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             if author_added[0]:
                 self.settingheader(303,'Location', '/login')
             else:
-                self.wfile.write(json.dumps({'info': author_added[1]}).encode('utf-8'))
+                self.settingheader(303,'Location', '/signup')
 
 
 
         # =========== /CREATEPOST
         if self.path == '/createpost' and self.command == 'POST':
-
+            # check if token exists
+            try:
+                user_data = self.verify_token()
+            except jwt.exceptions.ExpiredSignatureError:
+                user_data = None
+                self.settingheader(303, 'Location', '/')
+                
             if user_data:
                 # get POST data
                 content_length = int(self.headers['Content-Length'])
@@ -111,52 +104,91 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
                 # add new post to database
                 data = modify.separate_key_data(byte_data)
-                print(data)
                 post_added = edit_db.addBlogPost(user_data['user_id'], data[0]['post_title'], data[1]['post_body'], data[2]['post_tag'])
-                
                 if post_added[0]:
                     #  create new token
                     token = tokenit.tokenit(user_data['user_id'],user_data['user_name'])
                     # set header
-                    self.settingheader(200,'Location', '/profile', token)
+                    self.settingheader(303,'Location', '/profile', token)
+                else:
+                    #  create new token
+                    token = tokenit.tokenit(user_data['user_id'],user_data['user_name'])
+                    # set header
+                    self.settingheader(303,'Location', '/createpost', token)
 
 
 
         # =========== /UPDATEPOST
-        if self.path == '/updatepost/:id' and self.command == 'POST':
-
+        if self.path.split('/')[1] == 'updatepost' and self.command == 'POST':
+            # check if token exists
+            try:
+                user_data = self.verify_token()
+            except jwt.exceptions.ExpiredSignatureError:
+                user_data = None
+                self.settingheader(303, 'Location', '/')
             if user_data:
                 #  read POST data
                 content_length = int(self.headers['Content-Length'])
                 byte_data = self.rfile.read(content_length)
                 data = modify.separate_key_data(byte_data)
-                print(data)
 
                 # update data in database
-                post_id = self.path.split('/')[-1]
-                updated = edit_db.updateBlogPost(post_id, data[0]['post_title'], data[1]['post_body'], data[2]['post_tag'] )
-                if updated[0]:
-                    token = tokenit.tokenit(user_data['user_id'], user_data['user_name'])
-                    self.settingheader(303, 'Location', '/profile', token)
+                post_id = self.path.split('/')[2]
+                print(post_id)
+                # get post data
+                post_info = db.getPost(post_id)
+                print(post_info)
+                # update post data
+                updated = edit_db.updateBlogPost(post_id, data[0]['post_title'] if  data[0]['post_title'] else post_info[0][2], data[1]['post_body'] if data[1]['post_body'] else post_info[0][3], data[2]['post_tag'] if  data[2]['post_tag'] else post_info[0][4])
+                print(updated)
+                token = tokenit.tokenit(user_data['user_id'], user_data['user_name'])
+                self.settingheader(303, 'Location', '/profile', token)
 
 
 
         # ============ /UPDATEPROFILE
         if self.path == '/updateprofile' and self.command == 'POST':
+            # check if token exists
+            try:
+                user_data = self.verify_token()
+            except jwt.exceptions.ExpiredSignatureError:
+                user_data = None
+                print('token expired')
+                self.settingheader(303, 'Location', '/')
 
             if user_data:
                 #  read POST data
                 content_length = int(self.headers['Content-Length'])
                 byte_data = self.rfile.read(content_length)
                 data = modify.separate_key_data(byte_data)
-                print(data)
+                print('data', data)
 
+                # get all user info
+                user_info = db.getAuthor(user_data['user_id'])
+
+                id = user_data['user_id']
+                user_name = data[0]['user_name'] if data[0]['user_name']!= '' else user_info[0][1]
+
+                if data[1]['user_password'] != '':
+                    hashedpass = hashit.hashpassword(data[1]['user_password'])
+                    user_password = hashedpass
+                else:
+                    user_password = user_info[0][2]
                 # updata profile in database
-                updated = edit_db.updateAuthor(user_data['user_id'], data[0]['user_name'], data[1]['user_password'])
 
+                print('user name: ', user_name ,user_password)
+                updated = edit_db.updateAuthor(id, user_name, user_password)
+                print(updated)
                 if updated[0]:
+                    #  create new token
                     token = tokenit.tokenit(user_data['user_id'], data[0]['user_name'])
+                    # set header
                     self.settingheader(303, 'Location', '/profile', token)
+                else:
+                    #  create new token
+                    token = tokenit.tokenit(user_data['user_id'],user_data['user_name'])
+                    # set header
+                    self.settingheader(303, 'Location', '/updateprofile', token)
     
 
 
@@ -165,10 +197,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         # check if token exists
         try:
             user_data = self.verify_token()
-            print(user_data)
         except jwt.exceptions.ExpiredSignatureError:
             user_data = None
-            print('token expired')
+            print('token expired from get request')
 
 
         if self.path == '/' and self.command == 'GET':
@@ -178,7 +209,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 # setting header
                 self.settingheader(200, 'Content-type','text/html', token)
             else:
-                print('this has ran')
                 # setting header
                 self.settingheader(200, 'Content-type','text/html')
             # get all blogposts
@@ -202,6 +232,15 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 html = self.render_template('login.html',{})
                 # send html file 
                 self.wfile.write(html.encode('utf-8'))
+
+
+
+        elif self.path == '/signout' and self.command == 'GET':
+            self.send_response(303)
+            # Set the cookie to expire in the past
+            self.send_header('Set-Cookie', 'token=""; Expires=Thu, 01 Jan 1970 00:00:00 GMT;')
+            self.send_header('Location', '/login')
+            self.end_headers()
 
 
 
@@ -254,10 +293,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
 
-        elif self.path == '/updatepost/:id' and self.command == 'GET':
-
+        elif self.path.split('/')[1] == 'updatepost' and self.command == 'GET':
             if user_data:
-                post_id = self.path.split('/')[-1]
+                post_id = self.path.split('/')[2]
                 # new token 
                 token = tokenit.tokenit(user_data['user_id'],user_data['user_name'])
                 # setting header
@@ -267,8 +305,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 html = self.render_template('updatepost.html', {"data": postdata})
                 # send html file 
                 self.wfile.write(html.encode('utf-8'))
+            
             else:
-                self.settingheader(303,'Location', '/login')
+                self.settingheader(303,'Location','/login')
 
 
 

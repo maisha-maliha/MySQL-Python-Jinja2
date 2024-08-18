@@ -42,8 +42,8 @@
             margin: 10px 0;
         }
         a{
-            padding: 10px 15px;
-            margin: 5px 0;
+            padding: 6px 10px;
+            margin: 5px;
             background-color: royalblue;
             color: aliceblue;
             text-decoration: none;
@@ -59,6 +59,7 @@
             margin: 5px;
             border: 2px solid royalblue;
             color: royalblue;
+            background-color: aliceblue;
             text-decoration: none;
         }
     </style>
@@ -70,6 +71,7 @@
         <a href="/login">LOGIN</a>
         <a href="/signup">SIGNUP</a>
         <a href="/profile">PROFILE</a>
+        <a href="/signout">SIGNOUT</a>
     </nav>
     <h1>Hello {{ data[0][1]}} </h1>
     <div>
@@ -79,6 +81,7 @@
     </div>
     <div style="margin-top: 30px;">
         <h2>Your blogposts:</h2>
+        <a href="/createpost">CREATE POST</a>
         {% for post in posts %}
             <div  class="box">
                 <h2> {{post['post_title']}} </h2>

@@ -1,9 +1,12 @@
 import mysql.connector
-
+import config
 # add user
 def addAuthor(author_name, author_password):
     # connecting to database
-    cnx = mysql.connector.connect(user='root', password='test30',host='127.0.0.1',database='blog')
+    try:
+        cnx = mysql.connector.connect(user = config.DATABASE_USER, password = config.DATABASE_PASSWORD,host = config.DATABASE_HOST,database = config.DATABASE)
+    except:
+        return (False, "couldn't connect to database")
     cursor = cnx.cursor()
     query = f'INSERT INTO authors(user_name, user_password) VALUE ("{author_name}","{author_password}")'
     # doing query to databaseS
@@ -19,7 +22,7 @@ def addAuthor(author_name, author_password):
 def addBlogPost(author_id, post_title, post_body, post_tag):
     # connecting to database
     try:
-        cnx = mysql.connector.connect(user='root', password='test30',host='127.0.0.1',database='blog')
+        cnx = mysql.connector.connect(user = config.DATABASE_USER, password = config.DATABASE_PASSWORD,host = config.DATABASE_HOST,database = config.DATABASE)
     except:
         return (False, "couldn't connect to database")
     cursor = cnx.cursor()
@@ -37,10 +40,13 @@ def addBlogPost(author_id, post_title, post_body, post_tag):
 # update user info
 def updateAuthor(author_id, author_name, author_password):
     # connecting to database
-    cnx = mysql.connector.connect(user='root', password='test30',host='127.0.0.1',database='blog')
+    try:
+        cnx = mysql.connector.connect(user = config.DATABASE_USER, password = config.DATABASE_PASSWORD,host = config.DATABASE_HOST,database = config.DATABASE)
+    except:
+        return (False, "couldn't connect to database")
+    # query database
     cursor = cnx.cursor()
-    query = f"UPDATE authors SET author_name = '{author_name}', author_password = '{author_password}' WHERE author_id = {author_id}"
-    # doing query to database
+    query = f"UPDATE authors SET user_name = '{author_name}', user_password = '{author_password}' WHERE author_id = {author_id}"
     try:
          cursor.execute(query)
          cnx.commit()
@@ -54,7 +60,7 @@ def updateAuthor(author_id, author_name, author_password):
 def updateBlogPost(post_id, post_title, post_body, post_tag):
     # connecting to database
     try:
-       cnx = mysql.connector.connect(user='root', password='test30',host='127.0.0.1',database='blog')
+        cnx = mysql.connector.connect(user = config.DATABASE_USER, password = config.DATABASE_PASSWORD,host = config.DATABASE_HOST,database = config.DATABASE)
     except:
         return (False, "couldn't connect to database")
     cursor = cnx.cursor()

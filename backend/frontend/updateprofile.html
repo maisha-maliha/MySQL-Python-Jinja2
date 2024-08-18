@@ -56,13 +56,14 @@
         <a href="/login">LOGIN</a>
         <a href="/signup">SIGNUP</a>
         <a href="/profile">PROFILE</a>
+        <a href="/signout">SIGNOUT</a>
     </nav>
     <h1>Update Profile</h1>
     <form action="/updateprofile" method="POST">
         <label for="user_name">User Name:</label>
         <input type="text" name="user_name" value={{data[0][1]}}>
         <label for="password">password</label>
-        <input type="text" name="user_password" value={{data[0][2]}}>
+        <input type="text" name="user_password">
         <button>UPDATE</button>
     </form>
 </body>
