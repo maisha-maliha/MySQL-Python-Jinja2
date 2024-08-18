@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        body{
+            font-family: "Poppins", sans-serif;
+            width: 80%;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        .box{
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0px 5px 5px 5px rgba(222, 222, 222, 0.67);
+        }
+        span{
+            color: royalblue;
+            font-weight: 700;
+        }
+        p{
+            margin: 10px 0;
+        }
+        nav{
+            display: flex;
+            justify-content: end;
+            width: 100%;
+            margin: 30px 0;
+        }
+        a{
+            padding: 6px 10px;
+            margin: 5px;
+            border: 2px solid royalblue;
+            color: royalblue;
+            text-decoration: none;
+        }
+    </style>
+    <title>BLOG</title>
+</head>
+<body>
+    <nav>
+        <a href="/">HOME</a>
+        <a href="/login">LOGIN</a>
+        <a href="/signup">SIGNUP</a>
+        <a href="/profile">PROFILE</a>
+    </nav>
+    <h1>welcome to blog</h1>
+    <h2>Here are all the Blog posts by our greate bloggers</h2>
+    <div>
+        {% for post in data %}
+            <div id='{{ post[0]}}' class="box">
+                <h2>{{post['post_id']}} - {{post['post_title']}}</h2>
+                <span>By {{post['post_author']}} </span>
+                <p> {{post['post_body']}} </p>
+                <span> {{post['post_tag']}} </span>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
