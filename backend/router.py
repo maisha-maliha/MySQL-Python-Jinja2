@@ -8,6 +8,7 @@ import json
 import jwt
 import backend.modifydata as modify
 from http.cookies import SimpleCookie
+from backend.database import deletedata
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     # set header to response
@@ -45,7 +46,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     #  all POST request handled here
     def do_POST(self):
 
-
+        
         #  ========== /LOGIN
         if self.path == '/login' and self.command == 'POST':
             # get POST data
@@ -194,6 +195,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
     def do_GET(self):
+        print(self.path.split('/'))
         # check if token exists
         try:
             user_data = self.verify_token()
@@ -308,6 +310,17 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             
             else:
                 self.settingheader(303,'Location','/login')
+
+            
+        elif self.path.split('/')[1] == 'delete' and self.command == 'GET':
+            if user_data:
+                post_id = self.path.split('/')[2]
+                # new token 
+                token = tokenit.tokenit(user_data['user_id'],user_data['user_name'])
+                # setting header
+                postdata = deletedata.deleteBlogPost(post_id)
+                if postdata[0]:
+                    self.settingheader(303,'Location','/profile', token)
 
 
 

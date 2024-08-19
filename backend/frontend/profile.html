@@ -89,6 +89,7 @@
                 <p> {{post['post_body']}} </p>
                 <span> {{post['post_tag']}} </span>
                 <a href="/updatepost/{{ post['post_id'] }}">UPDATE POST</a>
+                <a href="/delete/{{ post['post_id'] }}">DELETE POST</a>
             </div>
         {% endfor %}
     </div>
