@@ -5,6 +5,7 @@ def run(server_class = HTTPServer, handler_class = router.SimpleHTTPRequestHandl
     server_address = ("", 8024)
     httpd = server_class(server_address, handler_class)
     print('server is running in 8024....')
+    print('click this link: http://localhost:8024/')
     httpd.serve_forever()
 
 
